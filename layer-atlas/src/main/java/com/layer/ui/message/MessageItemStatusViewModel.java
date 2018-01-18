@@ -4,30 +4,37 @@ package com.layer.ui.message;
 import android.content.Context;
 import android.databinding.Bindable;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
+import com.layer.ui.message.status.StatusMetadata;
+import com.layer.ui.util.json.AndroidFieldNamingStrategy;
 import com.layer.ui.viewmodel.ItemViewModel;
+
+import java.io.InputStreamReader;
 
 public class MessageItemStatusViewModel extends ItemViewModel<Message> {
     public static final String STATUS_ROOT_MIME_TYPE = "application/vnd.layer.status+json";
     public static final String RESPONSE_ROOT_MIME_TYPE = "application/vnd.layer.response+json";
-    private static final String RESPONSE_TEXT_MIME_TYPE = "application/vnd.layer.text+json";
+    // TODO REmove this backwards compatibility when web changes over to status responses
+    private static final String RESPONSE_TEXT_ROOT_MIME_TYPE = "application/vnd.layer.text+json";
 
     private CharSequence mText;
     private boolean mVisible;
-    private final JsonParser mJsonParser;
+    private final Gson mGson;
 
     public MessageItemStatusViewModel(Context context) {
         super(context, null);
-        mJsonParser = new JsonParser();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setFieldNamingStrategy(new AndroidFieldNamingStrategy());
+        mGson = gsonBuilder.create();
     }
 
     public void update() {
         Message message = getItem();
         MessagePart statusPart = null;
-        MessagePart responseTextPart = null;
         for (MessagePart part : message.getMessageParts()) {
             String mimeType = MessagePartUtils.getMimeType(part);
             if (mimeType == null) {
@@ -35,26 +42,20 @@ public class MessageItemStatusViewModel extends ItemViewModel<Message> {
             }
             switch (mimeType) {
                 case STATUS_ROOT_MIME_TYPE:
+                case RESPONSE_TEXT_ROOT_MIME_TYPE:
                     statusPart = part;
-                    break;
-                case RESPONSE_TEXT_MIME_TYPE:
-                    responseTextPart = part;
                     break;
             }
         }
 
         if (statusPart != null) {
             mVisible = true;
-            // TODO Handle with AND-1114
-        } else if (responseTextPart != null) {
-            mVisible = true;
-            String data = new String(responseTextPart.getData());
-            JsonObject jsonObject = mJsonParser.parse(data).getAsJsonObject();
-            mText = jsonObject.has("text") ? jsonObject.get("text").getAsString() : null;
+            JsonReader reader = new JsonReader(new InputStreamReader(statusPart.getDataStream()));
+            StatusMetadata metadata = mGson.fromJson(reader, StatusMetadata.class);
+            mText = metadata.getText();
         } else {
             mVisible = false;
         }
-
     }
 
     @Bindable
