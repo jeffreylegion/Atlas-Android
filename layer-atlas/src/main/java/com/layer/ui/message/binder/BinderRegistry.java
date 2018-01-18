@@ -11,6 +11,7 @@ import com.layer.ui.message.MessageCell;
 import com.layer.ui.message.MessageItemStatusViewModel;
 import com.layer.ui.message.MessagePartUtils;
 import com.layer.ui.message.button.ButtonMessageModel;
+import com.layer.ui.message.choice.ChoiceMessageModel;
 import com.layer.ui.message.file.FileMessageModel;
 import com.layer.ui.message.image.ImageMessageModel;
 import com.layer.ui.message.link.LinkMessageModel;
@@ -199,6 +200,7 @@ public class BinderRegistry {
         mMessageModelManager.registerModel(LinkMessageModel.ROOT_MIME_TYPE, LinkMessageModel.class);
         mMessageModelManager.registerModel(FileMessageModel.ROOT_MIME_TYPE, FileMessageModel.class);
         mMessageModelManager.registerModel(ButtonMessageModel.ROOT_MIME_TYPE, ButtonMessageModel.class);
+        mMessageModelManager.registerModel(ChoiceMessageModel.MIME_TYPE, ChoiceMessageModel.class);
     }
 
     public <T extends MessageModel> void registerModel(@NonNull String modelIdentifier, @NonNull Class<T> messageModelClass) {
