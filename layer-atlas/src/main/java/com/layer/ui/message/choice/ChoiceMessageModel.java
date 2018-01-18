@@ -14,7 +14,10 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.ui.BR;
 import com.layer.ui.R;
+import com.layer.ui.message.MessagePartUtils;
 import com.layer.ui.message.model.MessageModel;
+import com.layer.ui.repository.MessageSenderRepository;
+import com.layer.ui.response.ChoiceResponse;
 import com.layer.ui.util.json.AndroidFieldNamingStrategy;
 
 import java.io.InputStreamReader;
@@ -27,6 +30,7 @@ public class ChoiceMessageModel extends MessageModel {
     public static final String MIME_TYPE = "application/vnd.layer.choice+json";
 
     private ChoiceMessageMetadata mMetadata;
+    private String mNodeId;
     private ResponseSummary mResponseSummary;
     private List<String> mSelectedChoices;
     private Gson mGson;
@@ -35,13 +39,6 @@ public class ChoiceMessageModel extends MessageModel {
         super(context, layerClient);
         mGson = new GsonBuilder().setFieldNamingStrategy(new AndroidFieldNamingStrategy()).create();
         mSelectedChoices = new ArrayList<>();
-    }
-
-    public ChoiceMessageModel(Context context, LayerClient layerClient, ChoiceMessageMetadata metadata) {
-        this(context, layerClient);
-        mMetadata = metadata;
-        processSelections();
-        notifyPropertyChanged(BR.choiceMessageMetadata);
     }
 
     @Override
@@ -54,9 +51,7 @@ public class ChoiceMessageModel extends MessageModel {
         if (messagePart.equals(getRootMessagePart())) {
             JsonReader reader = new JsonReader(new InputStreamReader(messagePart.getDataStream()));
             mMetadata = mGson.fromJson(reader, ChoiceMessageMetadata.class);
-            for (ChoiceModel choiceModel : mMetadata.getChoices()) {
-                choiceModel.setMessage(getMessage());
-            }
+            mNodeId = MessagePartUtils.getNodeId(messagePart);
             processSelections();
             notifyPropertyChanged(BR.choiceMessageMetadata);
         }
@@ -149,6 +144,18 @@ public class ChoiceMessageModel extends MessageModel {
         } else if (mMetadata.getPreselectedChoice() != null) {
             mSelectedChoices.add(mMetadata.getPreselectedChoice());
         }
+    }
+
+    void sendResponse(@NonNull ChoiceMetadata choice) {
+        MessageSenderRepository messageSenderRepository = getMessageSenderRepository();
+        ChoiceResponse choiceResponse = new ChoiceResponse.ChoiceResponseBuilder()
+                .setMessageIdToRespondTo(getMessage().getId())
+                .setChoiceId(choice.getId())
+                .setChoiceText(choice.getText())
+                .setNodeIdToRespondTo(mNodeId)
+                .setResponseName(mMetadata.getResponseName())
+                .build();
+        messageSenderRepository.sendChoiceResponse(choiceResponse);
     }
 
     public static class ResponseSummary {

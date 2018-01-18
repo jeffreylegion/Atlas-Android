@@ -21,6 +21,7 @@ import com.layer.ui.identity.IdentityFormatter;
 import com.layer.ui.identity.IdentityFormatterImpl;
 import com.layer.ui.message.MessagePartUtils;
 import com.layer.ui.message.view.MessageView;
+import com.layer.ui.repository.MessageSenderRepository;
 import com.layer.ui.util.DateFormatter;
 import com.layer.ui.util.DateFormatterImpl;
 import com.layer.ui.util.Log;
@@ -46,6 +47,8 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
 
     private MessageModelManager mMessageModelManager;
 
+    private MessageSenderRepository mMessageSenderRepository;
+
     public MessageModel(Context context, LayerClient layerClient) {
         mIdentityFormatter = new IdentityFormatterImpl(context);
         mDateFormatter = new DateFormatterImpl(context);
@@ -53,6 +56,7 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
         mContext = context;
         mLayerClient = layerClient;
         mChildMessageModels = new ArrayList<>();
+        mMessageSenderRepository = new MessageSenderRepository(context, layerClient);
     }
 
     public void setMessage(@NonNull Message message) {
@@ -283,5 +287,9 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
     @Bindable
     public boolean isMessageFromMe() {
         return getLayerClient().getAuthenticatedUser().equals(getMessage().getSender());
+    }
+
+    protected MessageSenderRepository getMessageSenderRepository() {
+        return mMessageSenderRepository;
     }
 }

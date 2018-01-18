@@ -7,16 +7,15 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Message;
 import com.layer.ui.message.messagetypes.MessageSender;
 
+// TODO Need to be able to extend this class and customize the responses
 public class ResponseSender extends MessageSender {
-
-    private ResponseMessageComposer mComposer = new ResponseMessageComposer();
 
     public ResponseSender(Context context, LayerClient layerClient) {
         super(context, layerClient);
     }
 
-    public boolean requestSend(Message messageToRespondTo, String nodeIdToRespondTo, String choice, String status) {
-        Message message = mComposer.buildResponseMessage(getLayerClient(), messageToRespondTo,
+    public boolean sendChoiceResponse(Message messageToRespondTo, String nodeIdToRespondTo, String choice, String status) {
+        Message message = new ResponseMessageComposer().buildResponseMessage(getLayerClient(), messageToRespondTo,
                 nodeIdToRespondTo, choice, status);
         return send(message);
     }
