@@ -14,7 +14,6 @@ import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.MessagePart;
 import com.layer.ui.BR;
 import com.layer.ui.R;
-import com.layer.ui.message.MessagePartUtils;
 import com.layer.ui.message.model.MessageModel;
 import com.layer.ui.repository.MessageSenderRepository;
 import com.layer.ui.response.ChoiceResponse;
@@ -30,7 +29,6 @@ public class ChoiceMessageModel extends MessageModel {
     public static final String MIME_TYPE = "application/vnd.layer.choice+json";
 
     private ChoiceMessageMetadata mMetadata;
-    private String mNodeId;
     private ResponseSummary mResponseSummary;
     private List<String> mSelectedChoices;
     private Gson mGson;
@@ -51,7 +49,6 @@ public class ChoiceMessageModel extends MessageModel {
         if (messagePart.equals(getRootMessagePart())) {
             JsonReader reader = new JsonReader(new InputStreamReader(messagePart.getDataStream()));
             mMetadata = mGson.fromJson(reader, ChoiceMessageMetadata.class);
-            mNodeId = MessagePartUtils.getNodeId(messagePart);
             processSelections();
             notifyPropertyChanged(BR.choiceMessageMetadata);
         }
@@ -147,15 +144,20 @@ public class ChoiceMessageModel extends MessageModel {
     }
 
     void sendResponse(@NonNull ChoiceMetadata choice) {
-        MessageSenderRepository messageSenderRepository = getMessageSenderRepository();
+        String userName = getIdentityFormatter().getDisplayName(getLayerClient().getAuthenticatedUser());
+        String statusText = getContext().getString(R.string.response_message_status_text, userName,
+                choice.getText(), mMetadata.getLabel());
+
         ChoiceResponse choiceResponse = new ChoiceResponse.ChoiceResponseBuilder()
                 .setMessageIdToRespondTo(getMessage().getId())
                 .setChoiceId(choice.getId())
-                .setChoiceText(choice.getText())
-                .setNodeIdToRespondTo(mNodeId)
+                .setStatusText(statusText)
+                .setNodeIdToRespondTo(getRootNodeId())
                 .setResponseName(mMetadata.getResponseName())
                 .build();
-        messageSenderRepository.sendChoiceResponse(choiceResponse);
+
+        MessageSenderRepository messageSenderRepository = getMessageSenderRepository();
+        messageSenderRepository.sendChoiceResponse(getMessage().getConversation(), choiceResponse);
     }
 
     public static class ResponseSummary {

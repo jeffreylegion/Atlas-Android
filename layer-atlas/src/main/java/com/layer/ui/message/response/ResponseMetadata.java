@@ -1,61 +1,47 @@
 package com.layer.ui.message.response;
 
 
-import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Map;
+
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ResponseMetadata {
 
     @SerializedName("response_to")
-    private Uri mMessageIdInResponseTo;
+    private String mMessageIdToRespondTo;
 
     @SerializedName("response_to_node_id")
-    private String mNodeIdInResponseTo;
+    private String mNodeIdToRespondTo;
 
     @SerializedName("participant_data")
-    private ParticipantData mParticipantData;
+    private Map<Object, Object> mParticipantData;
 
     @Nullable
-    public Uri getMessageIdInResponseTo() {
-        return mMessageIdInResponseTo;
+    public String getMessageIdToRespondTo() {
+        return mMessageIdToRespondTo;
     }
 
-    public void setMessageIdInResponseTo(@Nullable Uri messageIdInResponseTo) {
-        mMessageIdInResponseTo = messageIdInResponseTo;
-    }
-
-    @Nullable
-    public String getNodeIdInResponseTo() {
-        return mNodeIdInResponseTo;
-    }
-
-    public void setNodeIdInResponseTo(@Nullable String nodeIdInResponseTo) {
-        mNodeIdInResponseTo = nodeIdInResponseTo;
+    public void setMessageIdToRespondTo(@Nullable String messageIdToRespondTo) {
+        mMessageIdToRespondTo = messageIdToRespondTo;
     }
 
     @Nullable
-    public ParticipantData getParticipantData() {
+    public String getNodeIdToRespondTo() {
+        return mNodeIdToRespondTo;
+    }
+
+    public void setNodeIdToRespondTo(@Nullable String nodeIdToRespondTo) {
+        mNodeIdToRespondTo = nodeIdToRespondTo;
+    }
+
+    public Map<Object, Object> getParticipantData() {
         return mParticipantData;
     }
 
-    public void setParticipantData(@Nullable ParticipantData participantData) {
+    public void setParticipantData(Map<Object, Object> participantData) {
         mParticipantData = participantData;
-    }
-
-    public static class ParticipantData {
-
-        @SerializedName("my_selection")
-        private String mSelection;
-
-        @Nullable
-        public String getSelection() {
-            return mSelection;
-        }
-
-        public void setSelection(@Nullable String selection) {
-            mSelection = selection;
-        }
     }
 }

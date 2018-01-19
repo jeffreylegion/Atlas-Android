@@ -41,6 +41,7 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
 
     private Message mMessage;
     private MessagePart mRootMessagePart;
+    private String mRootNodeId;
     private List<MessagePart> mChildMessageParts;
     private List<MessageModel> mChildMessageModels;
     private MessagePart mResponseSummaryPart;
@@ -56,7 +57,6 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
         mContext = context;
         mLayerClient = layerClient;
         mChildMessageModels = new ArrayList<>();
-        mMessageSenderRepository = new MessageSenderRepository(context, layerClient);
     }
 
     public void setMessage(@NonNull Message message) {
@@ -92,11 +92,11 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
 
     protected void processChildParts() {
         if (mRootMessagePart != null) {
-            String rootNodeId = MessagePartUtils.getNodeId(mRootMessagePart);
+            mRootNodeId = MessagePartUtils.getNodeId(mRootMessagePart);
             mChildMessageParts = null;
 
-            if (rootNodeId != null) {
-                mChildMessageParts = MessagePartUtils.getChildParts(mMessage, rootNodeId);
+            if (mRootNodeId != null) {
+                mChildMessageParts = MessagePartUtils.getChildParts(mMessage, mRootNodeId);
             }
 
             if (mChildMessageParts != null) {
@@ -289,7 +289,16 @@ public abstract class MessageModel extends BaseObservable implements LayerProgre
         return getLayerClient().getAuthenticatedUser().equals(getMessage().getSender());
     }
 
+    @NonNull
     protected MessageSenderRepository getMessageSenderRepository() {
+        if (mMessageSenderRepository == null) {
+            mMessageSenderRepository = new MessageSenderRepository(mContext, mLayerClient);
+        }
         return mMessageSenderRepository;
+    }
+
+    @Nullable
+    protected String getRootNodeId() {
+        return mRootNodeId;
     }
 }

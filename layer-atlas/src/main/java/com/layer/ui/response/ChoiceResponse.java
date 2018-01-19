@@ -14,14 +14,14 @@ public interface ChoiceResponse {
 
     String getChoiceId();
 
-    String getChoiceText();
+    String getStatusText();
 
     class ChoiceResponseBuilder {
         private Uri mMessageIdToRespondTo;
         private String mNodeIdToRespondTo;
         private String mResponseName;
         private String mChoiceId;
-        private String mChoiceText;
+        private String mStatusText;
 
         @NonNull
         public ChoiceResponseBuilder setMessageIdToRespondTo(Uri messageIdToRespondTo) {
@@ -44,8 +44,8 @@ public interface ChoiceResponse {
             return this;
         }
 
-        public ChoiceResponseBuilder setChoiceText(String choiceText) {
-            mChoiceText = choiceText;
+        public ChoiceResponseBuilder setStatusText(String statusText) {
+            mStatusText = statusText;
             return this;
         }
 
@@ -75,8 +75,8 @@ public interface ChoiceResponse {
                 }
 
                 @Override
-                public String getChoiceText() {
-                    return mChoiceText;
+                public String getStatusText() {
+                    return mStatusText;
                 }
             };
         }
