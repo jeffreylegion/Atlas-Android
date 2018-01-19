@@ -32,7 +32,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 
-import static android.support.v4.app.ActivityCompat.requestPermissions;
+
 import static android.support.v4.content.ContextCompat.checkSelfPermission;
 
 /**
