@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 
 import java.util.Map;
 
+/**
+ * Model class for creating a response message.
+ */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ResponseModel {
 

@@ -48,7 +48,7 @@ public class ChoiceMessageView extends MessageView<ChoiceMessageModel> implement
             public void onPropertyChanged(Observable sender, int propertyId) {
                 if (sender != model) return;
 
-                if (propertyId == BR.choiceMessageMetadata) {
+                if (propertyId == BR.choiceMessageMetadata || propertyId == BR.selectedChoices) {
                     processModel((ChoiceMessageModel) sender);
                 }
             }

@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
+/**
+ * Metadata for a response message
+ */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class ResponseMetadata {
 

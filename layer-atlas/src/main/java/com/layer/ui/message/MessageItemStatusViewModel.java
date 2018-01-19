@@ -18,8 +18,6 @@ import java.io.InputStreamReader;
 public class MessageItemStatusViewModel extends ItemViewModel<Message> {
     public static final String STATUS_ROOT_MIME_TYPE = "application/vnd.layer.status+json";
     public static final String RESPONSE_ROOT_MIME_TYPE = "application/vnd.layer.response+json";
-    // TODO REmove this backwards compatibility when web changes over to status responses
-    private static final String RESPONSE_TEXT_ROOT_MIME_TYPE = "application/vnd.layer.text+json";
 
     private CharSequence mText;
     private boolean mVisible;
@@ -42,7 +40,6 @@ public class MessageItemStatusViewModel extends ItemViewModel<Message> {
             }
             switch (mimeType) {
                 case STATUS_ROOT_MIME_TYPE:
-                case RESPONSE_TEXT_ROOT_MIME_TYPE:
                     statusPart = part;
                     break;
             }

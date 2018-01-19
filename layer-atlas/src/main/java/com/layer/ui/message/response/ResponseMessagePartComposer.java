@@ -9,9 +9,19 @@ import com.layer.ui.message.MessageItemStatusViewModel;
 import com.layer.ui.message.MessagePartUtils;
 import com.layer.ui.util.json.AndroidFieldNamingStrategy;
 
+/**
+ * Converts {@link ResponseModel}s to {@link MessagePart}s.
+ */
 @SuppressWarnings("WeakerAccess")
 public class ResponseMessagePartComposer {
 
+    /**
+     * Create a {@link MessagePart} from a {@link ResponseModel}
+     *
+     * @param layerClient used to create the MessagePart
+     * @param responseModel model to use when populating the part
+     * @return a MessagePart built from the ResponseModel data
+     */
     public MessagePart buildResponseMessagePart(LayerClient layerClient, ResponseModel responseModel) {
         Gson gson = new GsonBuilder().setFieldNamingStrategy(new AndroidFieldNamingStrategy()).create();
 

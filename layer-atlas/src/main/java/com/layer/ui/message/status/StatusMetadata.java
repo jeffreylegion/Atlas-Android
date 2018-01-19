@@ -5,6 +5,9 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Metadata for a status message
+ */
 public class StatusMetadata {
 
     @SerializedName("text")
