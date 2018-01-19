@@ -16,7 +16,8 @@ import com.layer.ui.BR;
 import com.layer.ui.R;
 import com.layer.ui.message.model.MessageModel;
 import com.layer.ui.repository.MessageSenderRepository;
-import com.layer.ui.response.ChoiceResponse;
+import com.layer.ui.message.response.ChoiceResponseModel;
+import com.layer.ui.util.Log;
 import com.layer.ui.util.json.AndroidFieldNamingStrategy;
 
 import java.io.InputStreamReader;
@@ -56,7 +57,6 @@ public class ChoiceMessageModel extends MessageModel {
 
     @Override
     protected void processResponseSummaryPart(@NonNull MessagePart responseSummaryPart) {
-        super.processResponseSummaryPart(responseSummaryPart);
         JsonReader reader = new JsonReader(new InputStreamReader(responseSummaryPart.getDataStream()));
         mResponseSummary = mGson.fromJson(reader, ResponseSummary.class);
         processSelections();
@@ -145,19 +145,30 @@ public class ChoiceMessageModel extends MessageModel {
 
     void sendResponse(@NonNull ChoiceMetadata choice) {
         String userName = getIdentityFormatter().getDisplayName(getLayerClient().getAuthenticatedUser());
-        String statusText = getContext().getString(R.string.response_message_status_text, userName,
-                choice.getText(), mMetadata.getLabel());
+        String statusText;
+        if (mMetadata.getLabel() == null) {
+            statusText = getContext().getString(R.string.response_message_status_text,
+                    userName, choice.getText());
+        } else {
+            statusText = getContext().getString(R.string.response_message_status_text_with_label,
+                    userName, choice.getText(), mMetadata.getLabel());
+        }
 
-        ChoiceResponse choiceResponse = new ChoiceResponse.ChoiceResponseBuilder()
-                .setMessageIdToRespondTo(getMessage().getId())
-                .setChoiceId(choice.getId())
-                .setStatusText(statusText)
-                .setNodeIdToRespondTo(getRootNodeId())
-                .setResponseName(mMetadata.getResponseName())
-                .build();
+        if (getRootNodeId() == null) {
+            if (Log.isLoggable(Log.ERROR)) {
+                Log.e("Choice message does not have a node ID, cannot process response. "
+                        + "Message ID: " + getMessage().getId());
+            }
+            throw new IllegalStateException("Choice message does not have a node ID, cannot "
+                    + "process response. Message ID: " + getMessage().getId());
+        }
+
+        ChoiceResponseModel choiceResponseModel = new ChoiceResponseModel(getMessage().getId(), getRootNodeId());
+        choiceResponseModel.setStatusText(statusText);
+        choiceResponseModel.addChoice(mMetadata.getResponseName(), choice.getId());
 
         MessageSenderRepository messageSenderRepository = getMessageSenderRepository();
-        messageSenderRepository.sendChoiceResponse(getMessage().getConversation(), choiceResponse);
+        messageSenderRepository.sendChoiceResponse(getMessage().getConversation(), choiceResponseModel);
     }
 
     public static class ResponseSummary {

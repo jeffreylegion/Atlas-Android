@@ -108,6 +108,7 @@ public class ChoiceMessageMetadata extends BaseObservable {
     }
 
     @Bindable
+    @NonNull
     public String getResponseName() {
         if (TextUtils.isEmpty(mResponseName)) {
             return DEFAULT_RESPONSE_NAME;
